@@ -1,10 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { FlightService } from '../../api-boarding';
 import { Flight } from '../../logic-flight';
-import { FlightCardComponent, FlightFilterComponent } from '../../ui-flight';
 import { BookingStore } from '../../logic-flight/+state/booking.store';
+import { FlightCardComponent, FlightFilterComponent } from '../../ui-flight';
 
 
 @Component({
