@@ -30,6 +30,9 @@ export const BookingStore = signalStore(
       () => store.flightEntities().filter(
         flight => flight.delayed
       )
+    ),
+    route: computed(
+      () => 'From ' + store.filter().from + ' to ' + store.filter().to + '.'
     )
   })),
   // Updaters

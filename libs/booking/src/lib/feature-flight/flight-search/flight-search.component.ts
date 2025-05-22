@@ -21,13 +21,6 @@ import { BookingStore } from '../../logic-flight/+state/booking.store';
 export class FlightSearchComponent {
   protected store = inject(BookingStore);
 
-  protected filter = this.store.filter;
-  protected route = computed(
-    () => 'From ' + this.filter().from + ' to ' + this.filter().to + '.'
-  );
-  protected basket = this.store.basket;
-  protected flights = this.store.flightEntities;
-
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   protected delay(flight: Flight): void {}
 
