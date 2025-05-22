@@ -9,12 +9,12 @@
 
     <app-flight-filter
       [filter]="store.filter()"
-      (filterChange)="store.setFilter($event)"
+      (filterChange)="flightEvents.flightFilterChanged($event)"
     >
       <div *ngIf="flights().length" class="flight-filter-info">
         {{ flights().length }} flights found!
       </div>
-      <button *ngIf="flights().length" (click)="store.resetFlights()"
+      <button *ngIf="flights().length" (click)="flightEvents.flightsReset()"
         class="btn btn-default flight-filter-button"
       >Reset</button>
     </app-flight-filter>
@@ -28,7 +28,10 @@
     <app-flight-card
       [item]="flight"
       [selected]="store.basket()[flight.id]"
-      (selectedChange)="store.updateBasket(flight.id, $event)"
+      (selectedChange)="flightEvents.basketUpdated({
+        id: flight.id,
+        selected: $event
+      })"
       (delayTrigger)="delay($event)"
     />
   </div>

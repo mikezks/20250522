@@ -1,12 +1,13 @@
-import { patchState, signalStore, type, withComputed, withHooks, withMethods, withState } from '@ngrx/signals';
-import { entityConfig, removeAllEntities, setAllEntities, setEntity, withEntities } from '@ngrx/signals/entities';
-import { tapResponse } from '@ngrx/operators';
-import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { FlightFilter } from '../model/flight-filter';
-import { Flight } from '../model/flight';
 import { computed, inject } from '@angular/core';
-import { pipe, switchMap } from 'rxjs';
+import { mapResponse } from '@ngrx/operators';
+import { patchState, signalStore, type, withComputed, withMethods, withState } from '@ngrx/signals';
+import { entityConfig, removeAllEntities, setAllEntities, setEntity, withEntities } from '@ngrx/signals/entities';
+import { Events, on, withEffects, withReducer } from '@ngrx/signals/events';
+import { switchMap } from 'rxjs';
 import { FlightService } from '../data-access/flight.service';
+import { Flight } from '../model/flight';
+import { FlightFilter } from '../model/flight-filter';
+import { flightEvents } from './flight.events';
 
 
 const flightConfig = entityConfig({
@@ -40,48 +41,43 @@ export const BookingStore = signalStore(
       () => 'From ' + store.filter().from + ' to ' + store.filter().to + '.'
     )
   })),
-  // Updaters
-  withMethods(store => ({
-    setFilter: (filter: FlightFilter) =>
-      patchState(store, { filter }),
-    setFlights: (flights: Flight[]) =>
-      patchState(
-        store,
-        setAllEntities(flights, flightConfig)
-      ),
-    setFlight: (flight: Flight) =>
-      patchState(
-        store,
-        setEntity(flight, flightConfig)
-      ),
-    updateBasket: (id: number, selected: boolean) =>
-      patchState(store, state => ({ basket: {
+  withReducer(    
+    on(flightEvents.basketUpdated, ({ payload: update }) => state => ({
+      basket: {
         ...state.basket,
-        [id]: selected
-      }})),
-    resetFlights: () => patchState(
-      store,
+        [update.id]: update.selected
+      }
+    })),
+    on(flightEvents.flightFilterChanged, ({ payload: filter }) =>
+      ({ filter })
+    ),
+    on(flightEvents.flightsChanged, ({ payload: flights }) =>
+      setAllEntities(flights, flightConfig)
+    ),
+    on(flightEvents.flightsReset, () =>
       removeAllEntities(flightConfig)
-    )
-  })),
-  // Side-Effects
-  withMethods((
+    ),
+    on(flightEvents.flightChanged, ({ payload: flight }) =>
+      setEntity(flight, flightConfig)
+    ),
+  ),
+  withEffects((
     store,
-    flightSerive = inject(FlightService)
+    events = inject(Events),
+    flightService = inject(FlightService)
   ) => ({
-    loadFlights: rxMethod<FlightFilter>(pipe(
-      switchMap(filter => flightSerive.find(
+    loadFlights$: events
+      .on(flightEvents.flightFilterChanged)
+      .pipe(
+        switchMap(({ payload: filter}) => flightService.find(
         filter.from,
         filter.to,
         filter.urgent
       )),
-      tapResponse(
-        flights => store.setFlights(flights),
-        err => console.error(err)
-      )
-    ))
-  })),
-  withHooks(store => ({
-    onInit: () => store.loadFlights(store.filter)
+      mapResponse({
+        next: flights => flightEvents.flightsChanged(flights),
+        error: err => console.error(err)
+      })
+    )
   }))
 );
