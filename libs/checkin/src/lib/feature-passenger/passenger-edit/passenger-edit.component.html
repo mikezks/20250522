@@ -48,6 +48,24 @@
         >
           Save
         </button>
+        <button
+          (click)="passengerResource.reload()"
+          class="btn btn-default"
+        >
+          Reload
+        </button>
+        <a
+          [routerLink]="['..', this.id() - 1]"
+          class="btn btn-default"
+        >
+          ID -1
+        </a >
+        <a
+          [routerLink]="['..', this.id() + 1]"
+          class="btn btn-default"
+        >
+          ID +1
+        </a >
       </div>
     </form>
   </div>
