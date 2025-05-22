@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FlightService } from '../../api-boarding';
-import { Flight, FlightFilter } from '../../logic-flight';
+import { Flight } from '../../logic-flight';
 import { FlightCardComponent, FlightFilterComponent } from '../../ui-flight';
 
 
@@ -35,24 +35,10 @@ export class FlightSearchComponent {
   protected flights: Flight[] = [];
 
   constructor() {
-    effect(() => console.log(this.route()));
-
     effect(() => {
       this.filter();
       untracked(() => this.search())
     });
-
-    console.log(this.filter().from);
-    this.filter.update(curr => ({ ...curr, from: 'Detroit' }));
-    console.log(this.filter().from);
-    this.filter.update(curr => ({ ...curr, from: 'San Francisco' }));
-    console.log(this.filter().from);
-    this.filter.update(curr => ({ ...curr, from: 'LA' }));
-    console.log(this.filter().from);
-    this.filter.update(curr => ({ ...curr, from: 'Houston' }));
-    console.log(this.filter().from);
-    this.filter.update(curr => ({ ...curr, from: 'San Diego' }));
-    console.log(this.filter().from);
   }
 
   protected search(): void {
