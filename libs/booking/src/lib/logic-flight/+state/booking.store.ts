@@ -1,5 +1,5 @@
 import { patchState, signalStore, type, withComputed, withHooks, withMethods, withState } from '@ngrx/signals';
-import { setAllEntities, withEntities } from '@ngrx/signals/entities';
+import { entityConfig, removeAllEntities, setAllEntities, setEntity, withEntities } from '@ngrx/signals/entities';
 import { tapResponse } from '@ngrx/operators';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { FlightFilter } from '../model/flight-filter';
@@ -8,6 +8,11 @@ import { computed, inject } from '@angular/core';
 import { pipe, switchMap } from 'rxjs';
 import { FlightService } from '../data-access/flight.service';
 
+
+const flightConfig = entityConfig({
+  entity: type<Flight>(),
+  collection: 'flight'
+});
 
 export const BookingStore = signalStore(
   { providedIn: 'root' },
@@ -23,7 +28,7 @@ export const BookingStore = signalStore(
       5: true
     } as Record<number, boolean>
   }),
-  withEntities({ entity: type<Flight>(), collection: 'flight' }),
+  withEntities(flightConfig),
   // Selector
   withComputed(store => ({
     delayedFlights: computed(
@@ -42,8 +47,22 @@ export const BookingStore = signalStore(
     setFlights: (flights: Flight[]) =>
       patchState(
         store,
-        setAllEntities(flights, { collection: 'flight' } )
-      )
+        setAllEntities(flights, flightConfig)
+      ),
+    setFlight: (flight: Flight) =>
+      patchState(
+        store,
+        setEntity(flight, flightConfig)
+      ),
+    updateBasket: (id: number, selected: boolean) =>
+      patchState(store, state => ({ basket: {
+        ...state.basket,
+        [id]: selected
+      }})),
+    resetFlights: () => patchState(
+      store,
+      removeAllEntities(flightConfig)
+    )
   })),
   // Side-Effects
   withMethods((

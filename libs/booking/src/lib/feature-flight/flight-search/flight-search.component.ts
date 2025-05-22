@@ -21,13 +21,17 @@ import { BookingStore } from '../../logic-flight/+state/booking.store';
 export class FlightSearchComponent {
   protected store = inject(BookingStore);
 
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  protected delay(flight: Flight): void {}
+  protected delay(flight: Flight): void {
+    const oldFlight = flight;
+    const oldDate = new Date(oldFlight.date);
 
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  protected updateBasket(id: number, selected: boolean): void {}
+    const newDate = new Date(oldDate.getTime() + 1000 * 60 * 5); // Add 5 min
+    const newFlight = {
+      ...oldFlight,
+      date: newDate.toISOString(),
+      delayed: true
+    };
 
-  protected reset(): void {
-    this.store.setFlights([]);
+    this.store.setFlight(newFlight);
   }
 }
