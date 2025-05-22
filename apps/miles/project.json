@@ -7,13 +7,68 @@
   "tags": [],
   "targets": {
     "build": {
+      "executor": "@angular-architects/native-federation:build",
+      "options": {},
+      "configurations": {
+        "production": {
+          "target": "miles:esbuild:production"
+        },
+        "development": {
+          "target": "miles:esbuild:development",
+          "dev": true
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "serve": {
+      "executor": "@angular-architects/native-federation:build",
+      "options": {
+        "target": "miles:serve-original:development",
+        "rebuildDelay": 0,
+        "dev": true,
+        "port": 0
+      }
+    },
+    "extract-i18n": {
+      "executor": "@angular-devkit/build-angular:extract-i18n",
+      "options": {
+        "buildTarget": "miles:build"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": [
+        "{workspaceRoot}/coverage/{projectRoot}"
+      ],
+      "options": {
+        "jestConfig": "apps/miles/jest.config.ts"
+      }
+    },
+    "serve-static": {
+      "executor": "@nx/web:file-server",
+      "options": {
+        "buildTarget": "miles:build",
+        "port": 4200,
+        "staticFilePath": "dist/apps/miles/browser",
+        "spa": true
+      }
+    },
+    "esbuild": {
       "executor": "@angular-devkit/build-angular:application",
-      "outputs": ["{options.outputPath}"],
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "options": {
         "outputPath": "dist/apps/miles",
         "index": "apps/miles/src/index.html",
         "browser": "apps/miles/src/main.ts",
-        "polyfills": ["zone.js"],
+        "polyfills": [
+          "zone.js",
+          "es-module-shims"
+        ],
         "tsConfig": "apps/miles/tsconfig.app.json",
         "inlineStyleLanguage": "scss",
         "assets": [
@@ -22,7 +77,9 @@
             "input": "apps/miles/public"
           }
         ],
-        "styles": ["apps/miles/src/styles.scss"],
+        "styles": [
+          "apps/miles/src/styles.scss"
+        ],
         "scripts": []
       },
       "configurations": {
@@ -49,41 +106,19 @@
       },
       "defaultConfiguration": "production"
     },
-    "serve": {
+    "serve-original": {
       "executor": "@angular-devkit/build-angular:dev-server",
       "configurations": {
         "production": {
-          "buildTarget": "miles:build:production"
+          "buildTarget": "miles:esbuild:production"
         },
         "development": {
-          "buildTarget": "miles:build:development"
+          "buildTarget": "miles:esbuild:development"
         }
       },
-      "defaultConfiguration": "development"
-    },
-    "extract-i18n": {
-      "executor": "@angular-devkit/build-angular:extract-i18n",
+      "defaultConfiguration": "development",
       "options": {
-        "buildTarget": "miles:build"
-      }
-    },
-    "lint": {
-      "executor": "@nx/eslint:lint"
-    },
-    "test": {
-      "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
-      "options": {
-        "jestConfig": "apps/miles/jest.config.ts"
-      }
-    },
-    "serve-static": {
-      "executor": "@nx/web:file-server",
-      "options": {
-        "buildTarget": "miles:build",
-        "port": 4200,
-        "staticFilePath": "dist/apps/miles/browser",
-        "spa": true
+        "port": 4201
       }
     }
   }
