@@ -17,7 +17,7 @@ export class FlightFilterComponent {
     this.inputFilterForm.setValue(filter);
   }
 
-  @Output() searchTrigger = new EventEmitter<FlightFilter>();
+  @Output() filterChange = new EventEmitter<FlightFilter>();
 
   protected inputFilterForm = inject(FormBuilder).nonNullable.group({
     from: ['', [Validators.required]],
@@ -30,6 +30,6 @@ export class FlightFilterComponent {
   });
 
   protected triggerSearch(): void {
-    this.searchTrigger.emit(this.inputFilterForm.getRawValue());
+    this.filterChange.emit(this.inputFilterForm.getRawValue());
   }
 }
