@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { FlightService } from '../../api-boarding';
 import { Flight } from '../../logic-flight';
 import { FlightCardComponent, FlightFilterComponent } from '../../ui-flight';
+import { BookingStore } from '../../logic-flight/+state/booking.store';
 
 
 @Component({
@@ -18,58 +19,22 @@ import { FlightCardComponent, FlightFilterComponent } from '../../ui-flight';
   templateUrl: './flight-search.component.html',
 })
 export class FlightSearchComponent {
-  private flightService = inject(FlightService);
+  protected store = inject(BookingStore);
 
-  protected filter = signal({
-    from: 'London',
-    to: 'New York',
-    urgent: false
-  });
+  protected filter = this.store.filter;
   protected route = computed(
     () => 'From ' + this.filter().from + ' to ' + this.filter().to + '.'
   );
-  protected basket: Record<number, boolean> = {
-    3: true,
-    5: true
-  };
-  protected flights: Flight[] = [];
+  protected basket = this.store.basket;
+  protected flights = this.store.flightEntities;
 
-  constructor() {
-    effect(() => {
-      this.filter();
-      untracked(() => this.search())
-    });
-  }
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  protected delay(flight: Flight): void {}
 
-  protected search(): void {
-    if (!this.filter().from || !this.filter().to) {
-      return;
-    }
-
-    this.flightService.find(
-      this.filter().from, this.filter().to, this.filter().urgent
-    ).subscribe(
-      flights => this.flights = flights
-    );
-  }
-
-  protected delay(flight: Flight): void {
-    const oldFlight = flight;
-    const oldDate = new Date(oldFlight.date);
-
-    const newDate = new Date(oldDate.getTime() + 1000 * 60 * 5); // Add 5 min
-    const newFlight = {
-      ...oldFlight,
-      date: newDate.toISOString(),
-      delayed: true
-    };
-
-    this.flights = this.flights.map(
-      flight => flight.id === newFlight.id ? newFlight : flight
-    );
-  }
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  protected updateBasket(id: number, selected: boolean): void {}
 
   protected reset(): void {
-    this.flights = [];
+    this.store.setFlights([]);
   }
 }

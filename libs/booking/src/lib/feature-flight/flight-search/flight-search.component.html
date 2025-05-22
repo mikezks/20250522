@@ -5,15 +5,14 @@
 
   <div class="card-body">
 
-    <!-- <app-flight-filter
+    <app-flight-filter
       [filter]="filter()"
-      (filterChange)="filter.set($event)"
-    > -->
-    <app-flight-filter [(filter)]="filter">
-      <div *ngIf="flights.length" class="flight-filter-info">
-        {{ flights.length }} flights found!
+      (filterChange)="store.setFilter($event)"
+    >
+      <div *ngIf="flights().length" class="flight-filter-info">
+        {{ flights().length }} flights found!
       </div>
-      <button *ngIf="flights.length" (click)="reset()"
+      <button *ngIf="flights().length" (click)="reset()"
         class="btn btn-default flight-filter-button"
       >Reset</button>
     </app-flight-filter>
@@ -23,10 +22,11 @@
 </div>
 
 <div class="row">
-  <div *ngFor="let flight of flights" class="col-xs-12 col-sm-6 col-md-4">
+  <div *ngFor="let flight of flights()" class="col-xs-12 col-sm-6 col-md-4">
     <app-flight-card
       [item]="flight"
-      [(selected)]="basket[flight.id]"
+      [selected]="basket()[flight.id]"
+      (selectedChange)="updateBasket(flight.id, $event)"
       (delayTrigger)="delay($event)"
     />
   </div>
