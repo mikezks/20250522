@@ -41,6 +41,18 @@ export class FlightSearchComponent {
       this.filter();
       untracked(() => this.search())
     });
+
+    console.log(this.filter().from);
+    this.filter.update(curr => ({ ...curr, from: 'Detroit' }));
+    console.log(this.filter().from);
+    this.filter.update(curr => ({ ...curr, from: 'San Francisco' }));
+    console.log(this.filter().from);
+    this.filter.update(curr => ({ ...curr, from: 'LA' }));
+    console.log(this.filter().from);
+    this.filter.update(curr => ({ ...curr, from: 'Houston' }));
+    console.log(this.filter().from);
+    this.filter.update(curr => ({ ...curr, from: 'San Diego' }));
+    console.log(this.filter().from);
   }
 
   protected search(): void {
