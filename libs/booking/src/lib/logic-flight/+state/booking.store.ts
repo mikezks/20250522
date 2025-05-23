@@ -27,7 +27,8 @@ export const BookingStore = signalStore(
       3: true,
       5: true
     } as Record<number, boolean>,
-    selectedOnly: false
+    selectedOnly: false,
+    delayedOnly: false,
   }),
   withEntities(flightConfig),
   // Selector
@@ -44,17 +45,25 @@ export const BookingStore = signalStore(
       () => store.flightEntities().filter(
         flight => store.basket()[flight.id]
       )
-    )
-  })),
-  withComputed(store => ({
-    flightResult: computed(() => store.selectedOnly()
-      ? store.selectedFlights()
-      : store.flightEntities()
-    )
+    ),
+    filteredFlights: computed(
+      () => store.flightEntities().filter(flight =>
+        (store.selectedOnly()
+          ? store.basket()[flight.id]
+          : true
+        ) && (store.delayedOnly()
+          ? flight.delayed
+          : true
+        )
+      )
+    ),
   })),
   withReducer(    
     on(flightEvents.selectedOnlyChanged, ({ payload: selected }) => ({
       selectedOnly: selected
+    })),
+    on(flightEvents.delayedOnlyChanged, ({ payload: selected }) => ({
+      delayedOnly: selected
     })),
     on(flightEvents.basketUpdated, ({ payload: update }) => state => ({
       basket: {

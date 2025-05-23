@@ -1,4 +1,4 @@
-@let flights = store.flightResult;
+@let flights = store.filteredFlights;
 
 <div class="card">
   <div class="card-header">
@@ -11,14 +11,26 @@
       [filter]="store.filter()"
       (filterChange)="flightEvents.flightFilterChanged($event)"
     >
-      <label class="flight-filter-control">
-        <input
-          [ngModel]="store.selectedOnly()"
-          (ngModelChange)="flightEvents.selectedOnlyChanged($event)"
-          type="checkbox"
-        />
-        Show selected flights only
-      </label>
+      <div class="form-group flight-filter-control">
+        <label>
+          <input
+            [ngModel]="store.selectedOnly()"
+            (ngModelChange)="flightEvents.selectedOnlyChanged($event)"
+            type="checkbox"
+          />
+          Show selected flights only
+        </label>
+      </div>
+      <div class="form-group flight-filter-control">
+        <label>
+          <input
+            [ngModel]="store.delayedOnly()"
+            (ngModelChange)="flightEvents.delayedOnlyChanged($event)"
+            type="checkbox"
+          />
+          Show delayed flights only
+        </label>
+      </div>
       <div *ngIf="flights().length" class="flight-filter-info">
         {{ flights().length }} flights found!
       </div>

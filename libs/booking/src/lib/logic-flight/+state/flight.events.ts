@@ -14,6 +14,7 @@ export const flightEvents = eventGroup({
     flightsReset: type<void>(),
     flightChanged: type<Flight>(),
     basketUpdated: type<{ id: number, selected: boolean }>(),
-    selectedOnlyChanged: type<boolean>()
+    selectedOnlyChanged: type<boolean>(),
+    delayedOnlyChanged: type<boolean>(),
   }
 });
