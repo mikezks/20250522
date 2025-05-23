@@ -1,12 +1,11 @@
 import { computed, inject } from '@angular/core';
 import { mapResponse } from '@ngrx/operators';
-import { patchState, signalStore, type, withComputed, withMethods, withState } from '@ngrx/signals';
+import { signalStore, type, withComputed, withState } from '@ngrx/signals';
 import { entityConfig, removeAllEntities, setAllEntities, setEntity, withEntities } from '@ngrx/signals/entities';
 import { Events, on, withEffects, withReducer } from '@ngrx/signals/events';
 import { switchMap } from 'rxjs';
 import { FlightService } from '../data-access/flight.service';
 import { Flight } from '../model/flight';
-import { FlightFilter } from '../model/flight-filter';
 import { flightEvents } from './flight.events';
 
 
@@ -20,14 +19,15 @@ export const BookingStore = signalStore(
   // State
   withState({
     filter: {
-      from: 'Graz',
-      to: 'Hamburg',
+      from: 'Hamburg',
+      to: 'Graz',
       urgent: false
     },
     basket: {
       3: true,
       5: true
-    } as Record<number, boolean>
+    } as Record<number, boolean>,
+    selectedOnly: false
   }),
   withEntities(flightConfig),
   // Selector
@@ -39,9 +39,23 @@ export const BookingStore = signalStore(
     ),
     route: computed(
       () => 'From ' + store.filter().from + ' to ' + store.filter().to + '.'
+    ),
+    selectedFlights: computed(
+      () => store.flightEntities().filter(
+        flight => store.basket()[flight.id]
+      )
+    )
+  })),
+  withComputed(store => ({
+    flightResult: computed(() => store.selectedOnly()
+      ? store.selectedFlights()
+      : store.flightEntities()
     )
   })),
   withReducer(    
+    on(flightEvents.selectedOnlyChanged, ({ payload: selected }) => ({
+      selectedOnly: selected
+    })),
     on(flightEvents.basketUpdated, ({ payload: update }) => state => ({
       basket: {
         ...state.basket,
